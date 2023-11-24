@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Ткаченко І.А. ІС-13 лаб №5 варіант 112</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .form-container, .table-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: auto;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="submit"], table, td {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box; 
+        }
+
+        input[type="submit"] {
+            background-color: #5cb85c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #4cae4c;
+        }
+
+        .invalid {
+            background-color: #ffdddd;
+        }
+
+        #output {
+            background-color: #e2e2e2;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 20px auto;
+            table-layout: fixed;
+        }
+
+        td {
+            height: 50px;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid black;
+            cursor: pointer;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <form name="myForm" onsubmit="return validateForm()" method="post">
+        ПІБ: <input type="text" name="fullName"><br>
+        Варіант: <input type="text" name="variant"><br>
+        Телефон: <input type="text" name="phone"><br>
+        Факультет: <input type="text" name="faculty"><br>
+        Адреса: <input type="text" name="address"><br>
+        <input type="submit" value="Перевірити">
+    </form>
+    <div id="output"></div>
+</div>
+
+<div class="table-container">
+    <table id="myTable">
+    </table>
+    <input type="color" id="colorPicker" style="display:none;" onchange="changeCellColor(selectedCell, this.value)">
+</div>
+
+<script>
+    function validateForm() {
+        let isValid = true;
+        const name = document.forms["myForm"]["fullName"];
+        const variant = document.forms["myForm"]["variant"];
+        const phone = document.forms["myForm"]["phone"];
+        const faculty = document.forms["myForm"]["faculty"];
+        const address = document.forms["myForm"]["address"];
+        const output = document.getElementById("output");
+
+        const nameRegex = /^[а-яА-ЯёЁіІїЇєЄ'-]+(\s[а-яА-ЯёЁіІїЇєЄ'-]+){1,2}$/;
+        const variantRegex = /^\d+$/;
+        const phoneRegex = /^\(\d{3}\)\-\d{3}\-\d{2}\-\d{2}$/;
+        const facultyRegex = /^[а-яА-ЯёЁіІїЇєЄ'\s]+$/;
+        const addressRegex = /^[а-яА-ЯёЁіІїЇєЄ0-9.,'\s]+$/;
+
+        if (!nameRegex.test(name.value)) {
+            name.classList.add("invalid");
+            isValid = false;
+        } else {
+            name.classList.remove("invalid");
+        }
+
+        if (!variantRegex.test(variant.value)) {
+            variant.classList.add("invalid");
+            isValid = false;
+        } else {
+            variant.classList.remove("invalid");
+        }
+
+        if (!phoneRegex.test(phone.value)) {
+            phone.classList.add("invalid");
+            isValid = false;
+        } else {
+            phone.classList.remove("invalid");
+        }
+
+        if (!facultyRegex.test(faculty.value)) {
+            faculty.classList.add("invalid");
+            isValid = false;
+        } else {
+            faculty.classList.remove("invalid");
+        }
+
+        if (!addressRegex.test(address.value)) {
+            address.classList.add("invalid");
+            isValid = false;
+        } else {
+            address.classList.remove("invalid");
+        }
+
+        if (isValid) {
+            output.innerHTML = "ПІБ: " + name.value + "<br>" +
+                "Варіант: " + variant.value + "<br>" +
+                "Телефон: " + phone.value + "<br>" +
+                "Факультет: " + faculty.value + "<br>" +
+                "Адреса: " + address.value;
+        } else {
+            output.innerHTML = "";
+        }
+
+        return false;
+    }
+
+    let selectedCell = null; 
+
+    function generateTable() {
+        let count = 1;
+        for (let i = 0; i < 6; i++) {
+            let row = document.createElement('tr');
+            for (let j = 0; j < 6; j++) {
+                let cell = document.createElement('td');
+                cell.textContent = count;
+                if (count === 2) {
+                    cell.onmouseover = function() { this.style.backgroundColor = getRandomColor(); };
+                    cell.onmouseout = function() { this.style.backgroundColor = ''; };
+                    cell.onclick = function() { selectedCell = this; document.getElementById('colorPicker').click(); };
+                }
+                cell.ondblclick = function() { highlightColumn(j); };
+                row.appendChild(cell);
+                count++;
+            }
+            document.getElementById('myTable').appendChild(row);
+        }
+    }
+
+    function highlightColumn(index) {
+        let table = document.getElementById('myTable');
+        let color = getRandomColor(); 
+        for (let i = 0; i < table.rows.length; i++) {
+            table.rows[i].cells[index].style.backgroundColor = color;
+        }
+    }
+
+    function getRandomColor() {
+        return '#' + Math.floor(Math.random()*16777215).toString(16);
+    }
+
+    function changeCellColor(cell, color) {
+        cell.style.backgroundColor = color;
+    }
+
+    generateTable();
+</script>
+
+</body>
+</html>
